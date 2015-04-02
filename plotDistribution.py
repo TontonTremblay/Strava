@@ -1,3 +1,18 @@
+""" 
+	This file read the data created from ReadDataSegment.py or 
+	any format. 
+	It needs as argument a file name to read from. 
+	It produces two graphs, the first one is named
+	cloud_NAMEFILE.pdf represents the performance distribution
+	of your segment over time. 
+	The second graph, 
+	dist_NAMEFILE.pdf is the probability distribution of all 
+	your performances. A Gaussian is also plot over it. 
+	Its title is  
+"""
+
+
+
 import time
 import matplotlib.pyplot as plt
 import datetime
@@ -5,6 +20,19 @@ import numpy as np
 import numpy
 import matplotlib.dates as md
 from scipy.stats import norm
+import sys
+
+# Comment this part if you do not want to use 
+# the provided font
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+
+prop = fm.FontProperties(fname='FuturaLT.ttf')
+
+
+
+
+
 
 def isTimeFormat(input):
     try:
@@ -21,8 +49,14 @@ def isDay(input):
         return False
 
 
+try:
+	fileName = sys.argv[1]
+except:
+	print "No name was given"
+	quit()
+data = open(fileName)
 
-data = open("Camilien-houde2.txt")
+fileName = fileName.replace(".data","")
 
 times = []
 dates = []
@@ -61,24 +95,38 @@ y = np.array([datetime.datetime(year = 1,month = 1,day = 1,
 # print x
 # print y
 plt.figure(1)
+
 # sub = plt.subplot(211)
 plt.plot(x,y,"yo",color="#0040ff",alpha =0.7)
 # plt.gcf().autofmt_xdate()
 
 ax=plt.gca()
 
+
+# ax.set_xticklabels(ax.xaxis.get_majorticklocs(), fontproperties=prop)
+ax.set_yticklabels(ax.yaxis.get_majorticklocs(), fontproperties=prop)
+
+
 yfmt = md.DateFormatter('%M:%S')
+
 ax.yaxis.set_major_formatter(yfmt)
-ax.set_xlabel("Months")
-ax.set_ylabel("Performance in M:S")
+
+
+ax.set_xlabel("Months",fontproperties=prop)
+ax.set_ylabel("Performance in M:S",fontproperties=prop)
 plt.gcf().autofmt_xdate()
-# ax.xaxis.tick_top()
+
+
 
 valuesFloat = [ float(s[2]+s[3])*60+float(s[5]+s[6]) for s in times]
 
-plt.title("Distribution of performance over time")
+plt.title("Performance over time for "+ fileName.replace("_"," ") +" segment" ,fontproperties=prop)
 # plt.show()
-plt.savefig("Cloud.pdf")
+
+
+plt.savefig("Cloud"+"_"+fileName+".pdf")
+
+
 
 
 # DIFFERENT DATA
@@ -108,7 +156,7 @@ plt.axvline(mu, color= '#101010', linestyle='-.', linewidth=1.3)
 plt.title("avg(--): " + str(time.strftime('%M:%S',time.gmtime(mu))) + 
 	", std: " + str(time.strftime('%M:%S',time.gmtime(std))) + 
 	", med(-.): " + str(time.strftime('%M:%S',time.gmtime(med))) + 
-	", n: "+ str(len(times)))
+	", n: "+ str(len(times)),fontproperties=prop)
 
 
 
@@ -132,21 +180,19 @@ for i in x:
 
 ax=plt.gca()
 
-values = [i for i in range(300,701,50)]
+values = ax.xaxis.get_majorticklocs()
 
-print values
 
-labels = dict()
 labels2 = []
 for v in values:
-	labels[v] = time.strftime('%M:%S',time.gmtime(v))
 	labels2.append(time.strftime('%M:%S',time.gmtime(v)))
 
-ax.set_xticklabels(labels2)
-ax.set_xlabel("Time in M:S")
+ax.set_yticklabels(ax.yaxis.get_majorticklocs(), fontproperties=prop)
+ax.set_xticklabels(labels2,fontproperties=prop)
+ax.set_xlabel("Time in M:S",fontproperties=prop)
 myFmt = md.DateFormatter('%S')
 # ax.xaxis.set_major_formatter(myFmt)
 plt.gcf().autofmt_xdate()
 
 # plt.show()
-# plt.savefig("dist.pdf")
+plt.savefig("Dist"+"_"+fileName+".pdf")
