@@ -3,3 +3,4 @@ CreateAccessStrava.py
 *.txt
 *.gpx
 *.token
+*.data
