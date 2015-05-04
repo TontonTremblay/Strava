@@ -93,31 +93,35 @@ valuesFloat = [ float(s[2]+s[3])*60+float(s[5]+s[6]) for s in times]
 
 #Find the holes in the data. Do something linear here. 
 
-setData = []
-j= 0
+holes = []
+j = 0 
 for i in range(len(dates)-1):
     if int(dates[i][5:7]) - int (dates[i+1][5:7]) > 0 :
-        setData.append( [ dates[j:i+1],times[j:i+1]] )
+        holes.append( [dates[j],dates[i]] )
         j = i+1
+holes.append( [dates[j],dates[-1]] )
 
-setData.append([dates[j:-1],times[j:-1]])
+        
 
 
-dataFinal = []
-
-for v in setData:
-    datesSub = v[0]
-    timesSub = v[1]
-    x = np.array([datetime.datetime(year = int(s[0:4]),
-        month = int(s[5:7]),
-        day = int(s[8:10])) for s in datesSub])
-
-    y = np.array([datetime.datetime(year = 1,month = 1,day = 1, 
-        hour = 1,minute = int(s[2]+s[3]), second = int(s[5]+s[6])) for s in timesSub])
-    dataFinal.append([x,y])
+h = []
+for v in holes:
+    r = np.array([datetime.datetime(year = int(s[0:4]),
+           month = int(s[5:7]),
+           day = int(s[8:10])) for s in v ])
+    h.append(r)
+t = holes
+holes = h
+h = t
 
 
 
+x = np.array([datetime.datetime(year = int(s[0:4]),
+       month = int(s[5:7]),
+       day = int(s[8:10])) for s in dates])
+
+y = np.array([datetime.datetime(year = 1,month = 1,day = 1,
+       hour = 1,minute = int(s[2]+s[3]), second = int(s[5]+s[6])) for s in times])
 
 
 
@@ -126,42 +130,87 @@ for v in setData:
 
 # print x
 # print y
-plt.figure(1)
+# plt.figure(1)
 
 # sub = plt.subplot(211)
-plt.plot(x,y,"yo",color="#0040ff",alpha =0.7)
-
-fig,(ax,ax2) = plt.subplots(2,1,sharey=True)
+# plt.plot(x,y,"yo",color="#0040ff",alpha =0.7)
 
 
+fig,axes = plt.subplots(1,len(holes),sharey=True)
 
 
-# plt.gcf().autofmt_xdate()
-
-# ax=plt.gca()
-
-
-# # ax.set_xticklabels(ax.xaxis.get_majorticklocs(), fontproperties=prop)
-# ax.set_yticklabels(ax.yaxis.get_majorticklocs(), fontproperties=prop)
+plt.title("Performance over time for "+ fileName.replace("_"," ") +" segment" ,ha="right",
+    fontproperties=prop)
 
 
-# yfmt = md.DateFormatter('%M:%S')
 
-# ax.yaxis.set_major_formatter(yfmt)
+
+
+for i,ax in enumerate(axes):
+    ax.plot(x,y,"yo",color="#0040ff",alpha =0.7)
+    
+
+    ax.set_xlim(holes[i][0],holes[i][1])
+    
+
+
+    #Display    
+
+
+    ax.set_xticklabels(ax.xaxis.get_majorticklocs(), fontproperties=prop)
+    ax.set_yticklabels(ax.yaxis.get_majorticklocs(), fontproperties=prop)
+    
+
+
+
+    ax.set_xlabel( h[i][0][0:4],fontproperties=prop)
+
+    ax.spines['right'].set_visible(False)
+
+    if not i is 0:
+        ax.yaxis.tick_left()
+        ax.spines['left'].set_visible(False)
+
+
+    if i is 0:
+        ax.set_ylabel("Performance in M:S",fontproperties=prop)
+
+    plt.gcf().autofmt_xdate()
+
+
+
+
+    ax.xaxis.set_major_formatter(md.DateFormatter('%m'))
+
+
+
+# plt.show()
+
+plt.gcf().autofmt_xdate()
+
+
+
+ax=plt.gca()
+
+
+yfmt = md.DateFormatter('%M:%S')
+
+ax.yaxis.set_major_formatter(yfmt)
 
 
 # ax.set_xlabel("Months",fontproperties=prop)
-# ax.set_ylabel("Performance in M:S",fontproperties=prop)
-# plt.gcf().autofmt_xdate()
 
 
 
+plt.gcf().autofmt_xdate()
 
-# plt.title("Performance over time for "+ fileName.replace("_"," ") +" segment" ,fontproperties=prop)
+
+plt.subplots_adjust(wspace=0.01)
+
 # plt.show()
 
 
-# plt.savefig("Cloud"+"_"+fileName+".pdf")
+plt.savefig("Cloud"+"_"+fileName+".pdf")
 
 
 
@@ -175,7 +224,9 @@ fig,(ax,ax2) = plt.subplots(2,1,sharey=True)
 
 
 
-# DIFFERENT DATA
+# Presenting the data distriution
+
+
 
 
 plt.clf()
