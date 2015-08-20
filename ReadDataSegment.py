@@ -70,7 +70,7 @@ dataOutput = ""
 
 c = 0
 
-print "looking for segment",segmentName
+print "looking for segment ",segmentName
 
 for act in activities:
 	
