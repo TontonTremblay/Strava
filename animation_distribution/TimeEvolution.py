@@ -57,9 +57,13 @@ for y in years:
     if not os.path.exists(directory+y):
         os.makedirs(directory+y)
  
+c = 0
 
+
+
+#This is the year long video
 while 1:
-    break
+    # break
     if i >= length-start:
         break
     elif  j-i < interval and j<length:
@@ -90,7 +94,7 @@ while 1:
     if not d1[3] in d2[3]:
         ax.annotate("New season",size="small",xy = [307,0.0113] )
         # print "hello"
-    ax.annotate(dft["performance (s.)"].median(), size="small",ha="left",xy=(dft["performance (s.)"].median()+7,0.0014))
+    ax.annotate(time.strftime('%M:%S',time.gmtime(dft["performance (s.)"].median())), size="small",ha="left",xy=(dft["performance (s.)"].median()+7,0.0014))
 
 
     #Write the pr
@@ -105,7 +109,7 @@ while 1:
         ax.annotate("Personal Best (year)", size="small",ha="left",xy=(553,0.0103))
 
         if not prs[k] is 'inf':
-            ax.annotate(k + ": " + str(prs[k]), size="small",ha="left",xy=(560,0.0103 - pos_y))
+            ax.annotate(k + ": " + time.strftime('%M:%S',time.gmtime(prs[k])), size="small",ha="left",xy=(560,0.0103 - pos_y))
         pos_y += 0.00045
 
 
@@ -121,8 +125,8 @@ while 1:
 
     ax.set_xticklabels(labels2)
 
-
-    sns.plt.savefig("output/"+str(i).zfill(3)+".png")
+    c+=1
+    sns.plt.savefig("output/all/"+str(c).zfill(3)+".png")
     # sns.plt.show()
     sns.plt.clf()
 
@@ -136,8 +140,10 @@ while 1:
 
 #Data per year
 for k in sorted(prs.keys()):
+    break
     s =  df[df["year"] == k]     
-
+    
+    print k
 
 
     sns.set(style="white", palette="muted", color_codes=True)
@@ -161,24 +167,21 @@ for k in sorted(prs.keys()):
     # sns.plt.show()
 
 
-
-
-
-
     #Create an animation of the year
-
-
-
-
-
-
     i = 0
     j = 1
     interval = 30 
-    length = s.count()["date"]
+    length = s.count()["date"]-1
+    c = 0
+
+
+    timeData = []
+    for r in s.iterrows():
+        timeData.append(r)
+    # print timeData
     while 1:
         
-        if i >= length-start:
+        if i >= length-10:
             break
         elif  j-i < interval and j<length:
             j+=1
@@ -190,7 +193,14 @@ for k in sorted(prs.keys()):
         if j is length:
             j -=1
 
-        dft = df[i:j]
+
+        dft = s[i:j]
+        
+        # print timeData[i][1]["date"]
+        # print s
+        # print dft[45].day
+        # print dft[46].day
+        # quit()
         ax  = sns.distplot(dft["performance (s.)"],hist=False,rug=True, color="r")
         maxValue.append( sns.plt.axis()[3])
         # sns.kdeplot(dft["performance (s.)"], bw=2, label="bw: 2")
@@ -198,8 +208,8 @@ for k in sorted(prs.keys()):
         sns.plt.axvline(dft["performance (s.)"].median(), color='#101010', linestyle='--', linewidth=1.3,alpha=0.5)
         # sns.plt.axvline(dft["performance (s.)"].mean(), color= '#101010', linestyle='-.', linewidth=1.3)
         
-        d1 = str(df["date"][i].year) + "/" + str(df["date"][i].month).zfill(2) + "/" + str(df["date"][i].day).zfill(2)
-        d2 = str(df["date"][j].year) + "/" + str(df["date"][j].month).zfill(2) + "/" + str(df["date"][j].day).zfill(2)
+        d1 = str(timeData[i][1]["year"]) + "/" + str(timeData[i][1]["month"]).zfill(2) + "/" + str(timeData[i][1]["day"]).zfill(2)
+        d2 = str(timeData[j][1]["year"]) + "/" + str(timeData[j][1]["month"]).zfill(2) + "/" + str(timeData[j][1]["day"]).zfill(2)
 
         ax.annotate(d1 + " to " + d2,ha="left",xy=(550,0.0112))
         
@@ -208,23 +218,15 @@ for k in sorted(prs.keys()):
         if not d1[3] in d2[3]:
             ax.annotate("New season",size="small",xy = [307,0.0113] )
             # print "hello"
-        ax.annotate(dft["performance (s.)"].median(), size="small",ha="left",xy=(dft["performance (s.)"].median()+7,0.0014))
+        ax.annotate(datetime.timedelta(seconds=dft["performance (s.)"].median()), size="small",ha="left",xy=(dft["performance (s.)"].median()+7,0.0014))
 
 
-        #Write the pr
-        pos_y = 0.00045
-        for k in sorted(prs.keys()):
-            s =  dft[dft["year"] == k]["performance (s.)"]     
-            #Update the personal best
-            if not s.count() == 0:
-                m = min (s)
-                if prs[k] > m:
-                    prs[k] = m 
-            ax.annotate("Personal Best (year)", size="small",ha="left",xy=(553,0.0103))
 
-            if not prs[k] is 'inf':
-                ax.annotate(k + ": " + str(prs[k]), size="small",ha="left",xy=(560,0.0103 - pos_y))
-            pos_y += 0.00045
+        performances =  min(dft[dft["year"] == k]["performance (s.)"])     
+        ax.annotate("Personal Best", size="small",ha="left",xy=(553,0.0103))
+
+        ax.annotate(str( datetime.timedelta(seconds=performances)), size="small",ha="left",xy=(560,0.0098))
+        #     pos_y += 0.00045
 
 
 
@@ -239,12 +241,14 @@ for k in sorted(prs.keys()):
 
         ax.set_xticklabels(labels2)
 
-
-        sns.plt.savefig("output/"+str(i).zfill(3)+".png")
-        sns.plt.show()
-        # sns.plt.clf()
-        break
-    break
+        # print "output/"+k+"/"+str(c).zfill(3)+".png"
+        sns.plt.savefig("output/"+k+"/"+str(c).zfill(3)+".png")
+        sns.plt.title(k)
+        c+=1
+        # sns.plt.show()  
+        sns.plt.clf()
+        # break
+    # break
 
 
 
