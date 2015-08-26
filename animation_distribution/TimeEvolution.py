@@ -61,9 +61,9 @@ c = 0
 
 
 
-#This is the year long video
+#This is the year long animation
 while 1:
-    # break
+    break
     if i >= length-start:
         break
     elif  j-i < interval and j<length:
@@ -124,12 +124,14 @@ while 1:
         labels2.append(time.strftime('%M:%S',time.gmtime(v)))
 
     ax.set_xticklabels(labels2)
-
+    sns.plt.title("Performance distribution (interval of "+ str(interval) +" days)\n (doted line is the interval median)")
+    ax.set_xlabel("Perfomance (minutes : seconds)")
+    ax.set_ylabel("Distribution (percent)")
     c+=1
     sns.plt.savefig("output/all/"+str(c).zfill(3)+".png")
     # sns.plt.show()
     sns.plt.clf()
-
+    # break
 # print max(maxValue)        
     
 
@@ -140,16 +142,15 @@ while 1:
 
 #Data per year
 for k in sorted(prs.keys()):
-    break
+    # break
     s =  df[df["year"] == k]     
     
-    print k
-
+    
 
     sns.set(style="white", palette="muted", color_codes=True)
     ax = sns.distplot(s["performance (s.)"], hist=False, rug=True, color="r")
     sns.plt.axvline(s["performance (s.)"].median(), color='#101010', linestyle='--', linewidth=1.3,alpha=0.5)
-    ax.annotate(datetime.timedelta(seconds= s["performance (s.)"].median()), size="small",ha="left",xy=(s["performance (s.)"].median()+7,0.0014))
+    ax.annotate(time.strftime('%M:%S',time.gmtime(s["performance (s.)"].median())), size="small",ha="left",xy=(s["performance (s.)"].median()+7,0.0014))
 
     sns.plt.axis([300, 700, 0, 0.012])
 
@@ -161,8 +162,12 @@ for k in sorted(prs.keys()):
         labels2.append(time.strftime('%M:%S',time.gmtime(v)))
 
     ax.set_xticklabels(labels2)
-    sns.plt.title("distribution performance in " + k + " n = "+str(s.count()["date"]))
-    sns.plt.savefig("output/dist_"+k+".pdf")
+    sns.plt.title("distribution performance in " + k + " n = "+str(s.count()["date"])+"\n (Dashed line is the median)")
+    
+    ax.set_xlabel("Perfomance (minutes : seconds)")
+    ax.set_ylabel("Distribution (percent)")
+
+    sns.plt.savefig("output/dist_"+k+".png")
     sns.plt.clf()
     # sns.plt.show()
 
@@ -180,7 +185,7 @@ for k in sorted(prs.keys()):
         timeData.append(r)
     # print timeData
     while 1:
-        
+        break
         if i >= length-10:
             break
         elif  j-i < interval and j<length:
@@ -218,14 +223,14 @@ for k in sorted(prs.keys()):
         if not d1[3] in d2[3]:
             ax.annotate("New season",size="small",xy = [307,0.0113] )
             # print "hello"
-        ax.annotate(datetime.timedelta(seconds=dft["performance (s.)"].median()), size="small",ha="left",xy=(dft["performance (s.)"].median()+7,0.0014))
+        ax.annotate(time.strftime('%M:%S',time.gmtime(dft["performance (s.)"].median())), size="small",ha="left",xy=(dft["performance (s.)"].median()+7,0.0014))
 
 
 
         performances =  min(dft[dft["year"] == k]["performance (s.)"])     
         ax.annotate("Personal Best", size="small",ha="left",xy=(553,0.0103))
 
-        ax.annotate(str( datetime.timedelta(seconds=performances)), size="small",ha="left",xy=(560,0.0098))
+        ax.annotate(time.strftime('%M:%S',time.gmtime(performances)), size="small",ha="left",xy=(560,0.0098))
         #     pos_y += 0.00045
 
 
@@ -240,7 +245,9 @@ for k in sorted(prs.keys()):
             labels2.append(time.strftime('%M:%S',time.gmtime(v)))
 
         ax.set_xticklabels(labels2)
-
+        ax.set_xlabel("Perfomance (minutes : seconds)")
+        ax.set_ylabel("Distribution (percent)")
+        
         # print "output/"+k+"/"+str(c).zfill(3)+".png"
         sns.plt.savefig("output/"+k+"/"+str(c).zfill(3)+".png")
         sns.plt.title(k)
@@ -267,8 +274,12 @@ for v in values:
     labels2.append(time.strftime('%M:%S',time.gmtime(v)))
 
 ax.set_xticklabels(labels2)
+sns.plt.title("Distribution performance all, n = "+str(df.count()["date"])+"\n (Dashed line is the median)")
 
-sns.plt.savefig("output/allDist.pdf")
+ax.set_xlabel("Perfomance (minutes : seconds)")
+ax.set_ylabel("Distribution (percent)")
+
+sns.plt.savefig("output/allDist.png")
 
 # sns.plt.show()
 
